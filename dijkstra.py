@@ -4,7 +4,7 @@ import networkx as nx
 from itertools import count
 import matplotlib.pyplot as plt
 
-
+'''
 class P_Dict(dict):
     def __init__(self, *args, **kwargs):
         super(P_Dict, self).__init__(*args, **kwargs)
@@ -30,31 +30,38 @@ class P_Dict(dict):
         else:
             self._rebuild_heap()
 
-def dijkstra(G,v):
+def dijkstra(G,v,t):
     dist_Q = P_Dict()
     dist_Q[v] = 0
     final_dist = {}
     dist = {}
     dist[v] = 0
     pred = {}
-    while len(final_dist) <len(G) and len(dist_Q) != 0:
-        w = dist_Q.pop_smallest()
-        final_dist[w] = dist[w]
-
-        for x in G[w]:
-            if x not in final_dist:
-                if x not in dist:
-                    dist[x] = final_dist[w] + G[w][x]['weight']
-                    dist_Q[x] = final_dist[w] + G[w][x]['weight']
-                elif final_dist[w] + G[w][x]['weight'] < dist[x]:
-                    dist[x] = final_dist[w] + G[w][x]['weight']
-                    dist_Q[x] = final_dist[w] + G[w][x]['weight']
-                    pred[x] = w
+    if v == t:
+        path = []
+        prev = t
+        while prev != None:
+            path.append(prev)
+            prev = pred.get(prev, None)
+        print('path :', str(path))
+    else:
+        while len(final_dist) <len(G) and len(dist_Q) != 0:
+            w = dist_Q.pop_smallest()
+            final_dist[w] = dist[w]
+            for x in G[w]:
+                   if x not in final_dist:
+                       if x not in dist:
+                           dist[x] = final_dist[w] + G[w][x]['weight']
+                           dist_Q[x] = final_dist[w] + G[w][x]['weight']
+                       elif final_dist[w] + G[w][x]['weight'] < dist[x]:
+                           dist[x] = final_dist[w] + G[w][x]['weight']
+                           dist_Q[x] = final_dist[w] + G[w][x]['weight']
+                           pred[x] = w
     return final_dist
-
+'''
 
 #### Directed Dijkstra Algorithm ####
-'''
+
 def dijkstra(graph, source, destination, weight = 'weight'):
     if source == destination:
         return({source: 0}, {source: [source]})
@@ -102,7 +109,7 @@ def shortest_path(graph, source, target, weight = 'weight'):
         raise nx.NetworkXNoPath(
             "node %s not reachable from %s" % (source, target))
 
-'''
+
 G = nx.DiGraph()
 G.add_edge(1,2,weight=1)
 G.add_edge(1,6,weight=0.5)
@@ -116,14 +123,13 @@ G.add_edge(6,2,weight=0.4)
 #nx.draw_networkx(G)
 #plt.show()
 G1 = nx.to_dict_of_dicts(G)
-f = dijkstra(G1,1)
-print(f)
-#(length, path) = dijkstra(G, 'a' ,'d', weight='weight')
-#print(length)
-#print(path)
+#f = dijkstra(G1,2,6)
+#print(f)
+(length, path) = dijkstra(G, 1 ,4, weight='weight')
+print(length)
+print(path)
 
-'''
-(length1,path1) = shortest_path(G,'a','b',weight='weight')
+
+length1 = shortest_path(G,1,4,weight='weight')
 print(length1)
-print(path1)
-'''
+
