@@ -4,7 +4,7 @@ import networkx as nx
 from itertools import count
 import matplotlib.pyplot as plt
 
-'''
+
 class P_Dict(dict):
     def __init__(self, *args, **kwargs):
         super(P_Dict, self).__init__(*args, **kwargs)
@@ -58,57 +58,6 @@ def dijkstra(G,v,t):
                            dist_Q[x] = final_dist[w] + G[w][x]['weight']
                            pred[x] = w
     return final_dist
-'''
-
-#### Directed Dijkstra Algorithm ####
-
-def dijkstra(graph, source, destination, weight = 'weight'):
-    if source == destination:
-        return({source: 0}, {source: [source]})
-    push = heappush
-    pop = heappop
-    distance = {} #Dictionary which store final distances traversed
-    path = {source : [source]} #Dictionary which stores paths
-    seen = {source : 0}
-    c = count()
-    f = []
-    push(f, (0, next(c), source))
-    while f:
-        (d, _,v) = pop(f)
-        if v in distance :
-            continue
-        distance[v] = d
-        if v == destination:
-            break
-        if graph.is_multigraph():
-            data = []
-            for w, keydata in graph[v].items():
-                m_weight = min((dd.get(weight, 1)
-                                 for k, dd in keydata.items()))
-                data.append((w, {weight: m_weight}))
-        else:
-            data = iter(graph[v].items())
-
-        for w, edgedata in data:
-            vw_dist = distance[v] + edgedata.get(weight, 1)
-            if w in distance:
-                if vw_dist < distance[w]:
-                    raise ValueError('Contradictory paths found:',
-                                     'negative weights?')
-            elif w not in seen or vw_dist < seen[w]:
-                seen[w] = vw_dist
-                push(f, (vw_dist, next(c), w))
-                path[w] = path[v] + [w]
-    return (distance, path)
-
-def shortest_path(graph, source, target, weight = 'weight'):
-    (length, path) = dijkstra(G, source, target, weight='weight')
-    try:
-        return path[target]
-    except KeyError:
-        raise nx.NetworkXNoPath(
-            "node %s not reachable from %s" % (source, target))
-
 
 G = nx.DiGraph()
 G.add_edge(1,2,weight=1)
@@ -123,13 +72,5 @@ G.add_edge(6,2,weight=0.4)
 #nx.draw_networkx(G)
 #plt.show()
 G1 = nx.to_dict_of_dicts(G)
-#f = dijkstra(G1,2,6)
-#print(f)
-(length, path) = dijkstra(G, 1 ,4, weight='weight')
-print(length)
-print(path)
-
-
-length1 = shortest_path(G,1,4,weight='weight')
-print(length1)
-
+f = dijkstra(G1,1,4)
+print(f)
