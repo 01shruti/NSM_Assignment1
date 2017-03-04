@@ -1,8 +1,10 @@
 #Dijkstra Algorithm
-
+from collections import deque
+from heapq import heappush, heappop
 import networkx as nx
 import numpy as np
 import matplotlib.pyplot as plt
+
 
 
 ###Creating Directed weighted graph
