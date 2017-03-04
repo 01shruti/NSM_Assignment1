@@ -1,7 +1,9 @@
-from collections import deque
+
 from heapq import heappop, heappush
 import networkx as nx
 from itertools import count
+import matplotlib.pyplot as plt
+
 #### Directed Dijkstra Algorithm ####
 
 def dijkstra(graph, source, destination, weight = 'weight'):
@@ -42,3 +44,34 @@ def dijkstra(graph, source, destination, weight = 'weight'):
                 push(f, (vw_dist, next(c), w))
                 path[w] = path[v] + [w]
     return (distance, path)
+
+def shortest_path(graph, source, target, weight = 'weight'):
+    (length, path) = dijkstra(G, source, target, weight='weight')
+    try:
+        return path[target]
+    except KeyError:
+        raise nx.NetworkXNoPath(
+            "node %s not reachable from %s" % (source, target))
+
+
+G = nx.DiGraph()
+G.add_edge('a','b',weight=1)
+G.add_edge('a','f',weight=0.5)
+G.add_edge('b','c',weight=0.5)
+G.add_edge('c','d',weight=0.5)
+G.add_edge('f','e',weight=0.6)
+G.add_edge('e','d',weight=2)
+G.add_edge('e','c',weight=1)
+G.add_edge('f','b',weight=0.4)
+
+nx.draw_networkx(G)
+plt.show()
+(length, path) = dijkstra(G, 'a' ,'d', weight='weight')
+print(length)
+print(path)
+
+'''
+(length1,path1) = shortest_path(G,'a','b',weight='weight')
+print(length1)
+print(path1)
+'''
