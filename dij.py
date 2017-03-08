@@ -115,32 +115,151 @@ def traversalB(node, nodeList1, nodeList2):
 #                                                                                                                      #
 # Description :                                                                                                        #
 # -------------                                                                                                        #
-# Type of data structure used in this algorithm is Priority Queue where                                                #
+# - Type of data structure used in this algorithm is Priority Queue imported from Queue library                        #
+# - Functions such as _object_.get() and _object_.put() has been used to push and pop the value of the variables resp  #
+# - The algorithm will calculate the distance based on the weights of edges of adjacent nodes: if the weight of one of #
+# the adjacent pair is less than the other; then the path will be calculated in the direction of least cost and it     #
+# keep on continuing until algorithm reaches its end or target node                                                    #
 #                                                                                                                      #
 ########################################################################################################################
 
 def dijkstra(graph, source, end):
-    queue_object = queue.PriorityQueue()
-    node = []
-    cost = []
-    start_weight = float("inf")
+    queue_object = queue.PriorityQueue()                                                # Creating priority queue object
+    node = []                                                                       # Empty list to store value of nodes
+    cost = []                                                                    # Empty list to store cost of each node
+    start_weight = float("inf")                                               # Initialising starting weight to infinity
+
+    # The following loop will append the initial weight and node which are 0 and none to cost and node list #
+
     for i in graph:
         weight = start_weight
         if source == i:
             weight = 0
         cost.append(weight)
         node.append(None)
+
+    # Pushing the value of object into priority queue #
+
     queue_object.put(([0, source]))
+
+    # Following loop will run until the queue is empty i.e. all nodes has been checked #
+
     while not queue_object.empty():
+
+        # Popping the value of node from priority queue #
+
         vertex_row = queue_object.get()
         vertex = vertex_row[1]
+
+        # Checking the cost of nodes for least value and updating the priority queue accordingly #
+
         for edge in graph[vertex]:
             if cost[edge] > cost[vertex] + graph[vertex][edge]['weight']:
                 cost[edge] = cost[vertex] + graph[vertex][edge]['weight']
                 node[edge] = vertex
                 queue_object.put(([cost[edge], edge]))
 
+    # For traversing the shortest path from source to target #
+
     path = traversalF(end, node)
+    return path
+
+
+########################################################################################################################
+#                                                                                                                      #
+# bidijkstra() Function                                                                                                #
+#                                                                                                                      #
+# This function implements Bidirectional Dijkstra algorithm for calculation of shortest path from source to destination#
+#                                                                                                                      #
+# Parameters:                                                                                                          #
+# -----------                                                                                                          #
+# graph : Graph generated from Networkx library                                                                        #
+# source : Value of the source node from which path has to be calculated                                               #
+# end : Value of the target node till which path has to be calculated                                                  #
+#                                                                                                                      #
+# Returns:                                                                                                             #
+# --------                                                                                                             #
+# Function will return the path traversed from the Bidirectional Dijkstra algorithm                                    #
+#                                                                                                                      #
+# Description :                                                                                                        #
+# -------------                                                                                                        #
+# - Type of data structure used in this algorithm is Priority Queue imported from Queue library                        #
+# - Functions such as _object_.get() and _object_.put() has been used to push and pop the value of the variables resp  #
+# - The algorithm will calculate the distance based on the weights of edges of adjacent nodes and the traversing is    #
+# done from both sides i.e. forward direction and backward direction                                                   #
+# - Calculation of weight is done from both direction and algorithm will continue traversing on least weight distance  #
+# - When the algorithm reaches at same node from both direction, traversing stops and path will be calculated          #
+#                                                                                                                      #
+########################################################################################################################
+
+def bidijkstra(graph,source,end):
+    forwardQ = queue.PriorityQueue()                              # Creating priority queue object for forward direction
+    backwardQ = queue.PriorityQueue()                            # Creating priority queue object for backward direction
+
+    setA = set()                                               # Creating set to store the adjacent values of neighbours
+    setB = set()
+
+    nodeF = []                                                # Empty list to store value of nodes for forward direction
+    nodeB = []                                               # Empty list to store value of nodes for backward direction
+
+    costF = []                                              # Empty list to store cost of each node in forward direction
+    costB = []                                             # Empty list to store cost of each node in backward direction
+
+    start_weight = float("inf")
+
+    # The following loop will append the initial weight and node which are 0 and none to cost and node list #
+
+    for i in graph:
+        weight = start_weight
+        if source == i:
+            weight = 0
+        costF.append(weight)
+        nodeF.append(None)
+
+    for i in graph:
+        weight = start_weight
+        if end == i:
+            weight = 0
+        costB.append(weight)
+        nodeB.append(None)
+
+    # Pushing the value of object into forward and backward priority queue #
+
+    forwardQ.put(([0, source]))
+    backwardQ.put(([0,end]))
+
+    # Following loop will run until both the queues are empty i.e. all nodes has been checked #
+
+    while not forwardQ.empty() and not backwardQ.empty():
+
+        # Function will traverse the nodes in forward anf backward direction alternatively #
+
+        if forwardQ.qsize() + len(setA) < backwardQ.qsize() + len(setB):
+            vertex_row1 = forwardQ.get()
+            vertex1 = vertex_row1[1]
+            setA.add(vertex1)
+            for edge in graph[vertex1]:
+                if costF[edge] > costF[vertex1] + graph[vertex1][edge]['weight']:
+                    costF[edge] = costF[vertex1] + graph[vertex1][edge]['weight']
+                    nodeF[edge] = vertex1
+                    forwardQ.put(([costF[edge], edge]))
+
+        else:
+            vertex_row2 = backwardQ.get()
+            vertex2 = vertex_row2[1]
+            setB.add(vertex2)
+            for edge in graph[vertex2]:
+                if costB[edge] > costB[vertex2] + graph[vertex2][edge]['weight']:
+                    costB[edge] = costB[vertex2] + graph[vertex2][edge]['weight']
+                    nodeB[edge] = vertex2
+                    backwardQ.put(([costB[edge], edge]))
+
+        # When the value of cost in forward direction is greater than and equal to cost in backward direction path #
+        # will be traversed from both the direction #
+
+        if costF[end] >= costB[source]:
+            path = traversalB(source, nodeF, nodeB)
+
     return path
 
 def graph_generator():
@@ -181,65 +300,6 @@ def graph_generator():
     G1.add_edge(4, 2, weight=1)
     G1.add_edge(5, 1, weight=0.4)
     return G1
-
-
-
-########################################################################################################################
-#                                                                                                                      #
-#                                        Bidirectional Dijkstra Algorithm                                              #
-#                                                                                                                      #
-########################################################################################################################
-
-def bidijkstra(graph,source,end):
-    forwardQ = queue.PriorityQueue()
-    backwardQ = queue.PriorityQueue()
-    setA = set()
-    setB = set()
-    nodeF = []
-    nodeB = []
-    costF = []
-    costB = []
-
-    start_weight = float("inf")
-    for i in graph:
-        weight = start_weight
-        if source == i:
-            weight = 0
-        costF.append(weight)
-        nodeF.append(None)
-    forwardQ.put(([0, source]))
-
-    for i in graph:
-        weight = start_weight
-        if end == i:
-            weight = 0
-        costB.append(weight)
-        nodeB.append(None)
-    backwardQ.put(([0,end]))
-
-    while not forwardQ.empty() and not backwardQ.empty():
-        if costF[end] >= costB[source]:
-            path = traversalB(source, nodeF, nodeB)
-        if forwardQ.qsize() + len(setA) < backwardQ.qsize() + len(setB):
-            vertex_row1 = forwardQ.get()
-            vertex1 = vertex_row1[1]
-            setA.add(vertex1)
-            for edge in graph[vertex1]:
-                if costF[edge] > costF[vertex1] + graph[vertex1][edge]['weight']:
-                    costF[edge] = costF[vertex1] + graph[vertex1][edge]['weight']
-                    nodeF[edge] = vertex1
-                    forwardQ.put(([costF[edge], edge]))
-
-        else:
-            vertex_row2 = backwardQ.get()
-            vertex2 = vertex_row2[1]
-            setB.add(vertex2)
-            for edge in graph[vertex2]:
-                if costB[edge] > costB[vertex2] + graph[vertex2][edge]['weight']:
-                    costB[edge] = costB[vertex2] + graph[vertex2][edge]['weight']
-                    nodeB[edge] = vertex2
-                    backwardQ.put(([costB[edge], edge]))
-    return path
 
 def main():
     g = graph_generator()
