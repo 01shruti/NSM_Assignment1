@@ -17,9 +17,13 @@
 ########################################################################################################################
 
 import queue
+import time
 import networkx as nx
+import numpy as np
 import matplotlib.pyplot as plt
 
+
+sTime = time.time()
 ########################################################################################################################
 #                                                                                                                      #
 # Shortestpath_length() Function                                                                                       #
@@ -263,53 +267,52 @@ def bidijkstra(graph,source,end):
     return path
 
 def graph_generator():
-    # G = nx.Graph()
-    # G.add_edge(0, 1, weight=1)
-    # G.add_edge(0, 5, weight=2)
-    # G.add_edge(1, 2, weight=12)
-    # G.add_edge(2, 3, weight=5)
-    # G.add_edge(5, 4, weight=6)
-    # G.add_edge(4, 3, weight=13)
-    # G.add_edge(4, 2, weight=7)
-    # G.add_edge(5, 1, weight=4)
 
-    # G = nx.Graph()
-    # G.add_edge(0, 1, weight=4)  # Adding Edges and weight
-    # G.add_edge(0, 2, weight=2)
-    # G.add_edge(1, 2, weight=1)
-    # G.add_edge(1, 3, weight=5)
-    # G.add_edge(2, 3, weight=8)
-    # G.add_edge(2, 4, weight=10)
-    # G.add_edge(4, 3, weight=2)
-    # G.add_edge(3, 5, weight=6)
-    # G.add_edge(4, 5, weight=3)
-    #pos = nx.spring_layout(G)  # positions for all nodes
-    # nx.draw_networkx(G,pos,node_size=700)
-    #labels = nx.get_edge_attributes(G, 'weight')
-    # nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
-    #nx.draw_networkx(G)
-    #plt.show()
+    # Generating random graph with 6 nodes and 10 possible edges #
 
-    G1 = nx.Graph()
-    G1.add_edge(0, 1, weight=1)
-    G1.add_edge(0, 5, weight=0.5)
-    G1.add_edge(1, 2, weight=0.5)
-    G1.add_edge(2, 3, weight=0.5)
-    G1.add_edge(5, 4, weight=0.6)
-    G1.add_edge(4, 3, weight=2)
-    G1.add_edge(4, 2, weight=1)
-    G1.add_edge(5, 1, weight=0.4)
-    return G1
+    G = nx.gnp_random_graph(6, 10)
+
+    # Assigning weights randomly to graph generated #
+
+    W = np.random.random_integers(low=1, high=10, size=len(G.edges()))
+    for i, (x,y) in enumerate(G.edges()):
+        G[x][y]['weight'] = W[i]
+
+    pos = nx.circular_layout(G)
+    nx.draw_networkx(G, pos, node_size=500)
+    lab = nx.get_edge_attributes(G, 'weight')
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=lab)
+    plt.axis('off')
+    plt.savefig("graph.png")
+    plt.show()
+    return G
 
 def main():
+
     g = graph_generator()
     g = nx.to_dict_of_dicts(g)
-    path = dijkstra(g, 0, 3)
+
+    # Calling Dijkstra function #
+
+    print("Shortest path calculation using Dijkstra algorithm ")
+    print("---------------------------------------------------")
+    path = dijkstra(g, 0, 4)
+    print(path, "\n")
+
+    print("Shortest path length calculation using Dijkstra algorithm ")
+    print("----------------------------------------------------------")
     distance = shortestpath_length(g, path)
-    print(path,distance)
-    path = bidijkstra(g, 0, 3)
+    print(distance, "\n")
+
+    print("Shortest path calculation using Bidirectional Dijkstra algorithm ")
+    print("-----------------------------------------------------------------")
+    path = bidijkstra(g, 0, 4)
+    print(path, "\n")
+
+    print("Shortest path length calculation using Bidirectional Dijkstra algorithm ")
+    print("------------------------------------------------------------------------")
     distance = shortestpath_length(g,path)
-    print(path,distance)
+    print(distance, "\n")
 
 if __name__ == "__main__":
     main()
