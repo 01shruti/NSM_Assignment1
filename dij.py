@@ -23,7 +23,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-sTime = time.time()
 ########################################################################################################################
 #                                                                                                                      #
 # Shortestpath_length() Function                                                                                       #
@@ -270,7 +269,7 @@ def graph_generator():
 
     # Generating random graph with 6 nodes and 10 possible edges #
 
-    G = nx.gnp_random_graph(6, 10)
+    G = nx.dense_gnm_random_graph(30, 25)
 
     # Assigning weights randomly to graph generated #
 
@@ -293,26 +292,37 @@ def main():
     g = nx.to_dict_of_dicts(g)
 
     # Calling Dijkstra function #
-
+    sTime = time.clock()
     print("Shortest path calculation using Dijkstra algorithm ")
     print("---------------------------------------------------")
-    path = dijkstra(g, 0, 4)
+    path = dijkstra(g, 0, 3)
     print(path, "\n")
 
+    ttime = time.clock() - sTime
     print("Shortest path length calculation using Dijkstra algorithm ")
     print("----------------------------------------------------------")
     distance = shortestpath_length(g, path)
     print(distance, "\n")
 
+    print("Run time for Dijkstra algorithm ")
+    print("--------------------------------")
+    print(round(ttime,6), " seconds\n")
+
+    sTime = time.clock()
     print("Shortest path calculation using Bidirectional Dijkstra algorithm ")
     print("-----------------------------------------------------------------")
-    path = bidijkstra(g, 0, 4)
+    path = bidijkstra(g, 0, 3)
     print(path, "\n")
 
+    ttime = time.clock() - sTime
     print("Shortest path length calculation using Bidirectional Dijkstra algorithm ")
     print("------------------------------------------------------------------------")
     distance = shortestpath_length(g,path)
     print(distance, "\n")
+
+    print("Run time for Bidirectional Dijkstra algorithm ")
+    print("----------------------------------------------")
+    print(round(ttime,6), " seconds")
 
 if __name__ == "__main__":
     main()
